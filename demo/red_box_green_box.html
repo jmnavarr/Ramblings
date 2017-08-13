@@ -1,0 +1,148 @@
+<!DOCTYPE>
+<html>
+	<head>
+		<title>Red box, green box</title>
+		<style type="text/css">
+			#wrapper-div {
+				position: relative;
+				height: 100%;
+				width: 100%;
+			}
+			#red-box {
+				border: 2px solid #000;
+				height: 496px;
+				width: 496px;
+				background-color: red;
+				position: absolute;
+				left: 50%;
+				top: 50%;
+				-webkit-transform: translate(-50%, -50%);
+				transform: translate(-50%, -50%);
+			}
+			#green-box {
+				border: 2px solid #000;
+				height: 46px;
+				width: 46px;
+				background-color: #00dd00;
+				position: absolute;
+				left: 50%;
+				top: 50%;
+				-webkit-transform: translate(-50%, -50%);
+				transform: translate(-50%, -50%);
+			}
+			#green-box:hover {
+				background-color: #00ff00;
+				cursor: -webkit-grab;
+			}
+			#distance-label {
+				text-align: center;
+				width: 100%;
+				display: block;
+				position: absolute;
+				left: 50%;
+				top: 50%;
+				-webkit-transform: translate(-50%, -50%);
+				transform: translate(-50%, -50%);
+			}
+		</style>
+		<script type="text/javascript">
+			document.onmousedown = OnMouseDown;
+			document.onmouseup = OnMouseUp;
+			_dragElement = null;
+			
+			function OnMouseDown(e) {
+				if(e.target.id == 'green-box' || e.target.id == 'distance-label') {
+					target = e.target;
+					
+					if(e.target.id == 'distance-label') {
+						target = e.target.parentElement;
+					}
+				
+					target.style.cursor = '-webkit-grabbing';
+				
+					// mouse click coordinates
+					_startX = e.clientX;
+					_startY = e.clientY;
+					
+					_offsetX = ExtractNumber(target.offsetLeft);
+					_offsetY = ExtractNumber(target.offsetTop);
+					
+					_dragElement = target;
+
+					// tell our code to start moving the element with the mouse
+					document.onmousemove = OnMouseMove;
+					
+					return false;
+				}
+			}
+			function OnMouseMove(e) {
+				if(e.target.id == 'green-box' || e.target.id == 'distance-label') {
+					target = e.target;
+					
+					if(e.target.id == 'distance-label') {
+						target = e.target.parentElement;
+					}
+					
+					target.style.cursor = '-webkit-grabbing';
+					
+					distance_label = document.getElementById('distance-label');
+				
+					new_x_offset = _offsetX + e.clientX - _startX;
+					new_y_offset = _offsetY + e.clientY - _startY;
+					
+					if(new_x_offset > 23 && new_x_offset < 473) {
+						_dragElement.style.left = new_x_offset + 'px';
+					}
+					
+					if(new_y_offset > 23 && new_y_offset < 473) {
+						_dragElement.style.top = new_y_offset + 'px';
+					}
+
+					distance = Math.round(Math.sqrt(
+						Math.pow(248 - new_x_offset, 2) + 
+						Math.pow(248 - new_y_offset, 2)));
+					
+					distance_label.innerText = distance;
+				}
+			}
+			function OnMouseUp(e) {
+				if(e.target.id == 'green-box' || e.target.id == 'distance-label') {
+					target = e.target;
+					
+					if(e.target.id == 'distance-label') {
+						target = e.target.parentElement;
+					}
+					
+					if (_dragElement != null) {
+
+						target.style.cursor = '-webkit-grab';
+					
+						// we're done with these events until the next OnMouseDown
+						document.onmousemove = null;
+						document.onselectstart = null;
+						_dragElement.ondragstart = null;
+
+						// this is how we know we're not dragging      
+						_dragElement = null;
+					}
+				}
+			}
+			function ExtractNumber(value) {
+				var n = parseInt(value);
+				
+				result = n == null || isNaN(n) ? 0 : n;
+				
+				return result;
+			}
+		</script>
+	</head>
+	<body>
+		<div id="wrapper-div">
+			<div id="red-box">
+				<div id="green-box" class="drag">
+					<span id="distance-label">0</span>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
